@@ -102,3 +102,31 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res) => {
         res.json({ message: "Removed link" });
     }
 });
+
+app.get("/api/v1/brain/:shareLink", async (req, res) => {
+    const hash = req.params.shareLink;
+
+    const link = await LinkModel.findOne({
+        hash
+    });
+
+    if(!link){
+        res.status(411).json({
+            message: "Sorry incorrect input"
+        })
+        return;
+    }
+
+    const content = await ContentModel.find({
+        userId: link.userId
+    })
+
+    const user = await UserModel.findOne({
+        _id: link.userId
+    })
+
+    res.json({
+        username: user?.username,
+        content: content
+    })
+})
